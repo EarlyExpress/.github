@@ -1,12 +1,143 @@
-## Hi there 👋
+# EarlyExpress 프로젝트
 
-<!--
+## EarlyExpress
+EarlyExpress는 전국 17개 지역 물류 허브를 중심으로 운영되는 기업용 물류 플랫폼입니다.
+우리의 목표는 허브 간 물류 이동·배송·업체 관리를 하나의 일관된 플랫폼에서 처리하여
+기업의 물류 운영 효율을 극대화하는 것입니다.
 
-**Here are some ideas to get you started:**
+전통적인 물류 운영에서 발생하는 복잡한 수작업 절차(업체 확인, 배송 배정, 이동 경로 관리, 권한 관리)를
+클라우드 기반 MSA 아키텍처로 재설계하여 확장성과 안정성을 확보했습니다.
 
-🙋‍♀️ A short introduction - what is your organization all about?
-🌈 Contribution guidelines - how can the community get involved?
-👩‍💻 Useful resources - where can the community find your docs? Is there anything else the community should know?
-🍿 Fun facts - what does your team eat for breakfast?
-🧙 Remember, you can do mighty things with the power of [Markdown](https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
--->
+## 문제 정의
+국내 물류 산업은 지역 허브를 기반으로 운영되며,
+허브 간 이동·배송 인력 관리·업체 관리·주문 처리 등 여러 복잡한 도메인이 동시에 얽혀 있는 구조를 가진다.
+이 과정에서 다음과 같은 문제가 반복적으로 발생한다:
+
+### 기본 물류 운영의 주요 문제
+- 허브 간 이동 경로가 복잡하여 수작업 관리로는 운영이 어려움
+- 배송 담당자 배정 및 라우팅이 비효율적으로 이루어짐
+- 생산업체/수령업체 정보가 분산되어 있어 전체 흐름 파악이 어려움
+- 권한 체계가 복잡하여 일관된 접근 통제 수행이 어려움
+- 실시간 배송 추적·운영 상태 파악이 어렵고 오류 대응이 느림
+- 단일 시스템으로 운영되면 확장성과 장애 대응력이 떨어짐
+
+이러한 문제들은 전국 허브 기반 물류에서 공통적으로 발생하며,
+규모가 커질수록 수작업이나 단일 시스템으로 해결할 수 없는 수준에 이른다.
+
+## 이 문제를 해결한 글로벌 사례
+이와 같은 허브 기반 물류 문제는 이미
+한국의 쿠팡, 미국의 아마존(Amazon Logistics) 과 같은 기업들이 경험하고 해결해왔다.
+이들은 다음과 같이 문제를 해결했다:
+- 복잡한 허브 네트워크를 데이터 기반으로 전면 재설계
+- 배송 인력 배정 알고리즘 도입
+- 실시간 재고·배송 추적 시스템 구축
+- 권한 기반 통합 관리 시스템 적용
+- 서비스를 MSA 구조로 분리하여 확장성 확보
+
+즉, “복잡한 도메인을 기술적으로 단순화하고 자동화하는 방식”으로
+대규모 물류 시스템을 구축하여 성공적으로 운영 중이다.
+
+## EarlyExpress의 접근 방식
+
+EarlyExpress는 이러한 실제 대규모 물류 시스템을
+교육·개발 환경에 맞게 구조적으로 축소하여 추상화한 버전입니다.
+우리는 복잡한 물류 도메인을 다음과 같은 방향으로 재구성합니다:
+
+### 1. 복잡한 물류 흐름을 추상화
+- 허브, 배송 인력, 업체, 배송, 주문 등 복잡한 도메인을 각각 독립적인 서비스(Microservice)로 분리
+- 허브 간 경로 모델링을 단순화하여 핵심만 유지
+- 배송 인력 배정 로직을 추상화하여 서비스 간 API로 제어
+
+### 2. 현실 세계의 문제를 단순한 MSA 구조로 재해석
+- 허브 관리 / 업체 관리 / 배송 관리 등을 독립 서비스로 운영
+- Eureka + Gateway 기반 서비스 디스커버리로 실제 물류 구조와 유사한 환경 구성
+- Keycloak 기반 RBAC 적용 → 대규모 시스템에서 필요한 보안 구조를 간단하게 재현
+* RBAC(Role-Based Access Control)란?
+사용자에게 직접 권한을 부여하지 않고,
+“역할(Role)”이라는 중간 계층을 통해 권한을 관리하는 방식
+
+### 3. 문제 해결 경험을 얻기 위한 구조적 설계
+- 실제 대규모 기업 수준의 복잡도를 가지되
+- 구현은 "교육 가능한 수준"으로 단순화
+- 확장성·분리·도메인 경계 설계 등 MSA의 핵심 경험을 획득
+
+## 주요 기술 스택
+| 영역                               | 기술                             |
+| -------------------------------- | ------------------------------ |
+| **Backend**                      | Spring Boot 3.x                |
+| **Database**                     | PostgreSQL (서비스별 독립 스키마 구조)    |
+| **Service Discovery**            | Spring Cloud Eureka            |
+| **API Gateway**                  | Spring Cloud Gateway           |
+| **Configuration Management**     | **Spring Cloud Config Server** |
+| **Authentication/Authorization** | Keycloak + JWT, RBAC 기반        |
+| **Asynchronous Messaging**       | **Apache Kafka**               |
+| **Distributed Tracing**          | Zipkin                         |
+| **AI/ML**                        | Spring AI + Gemini API         |
+| **Documentation**                | Swagger / SpringDoc            |
+| **Monitoring**                   | **Prometheus + Grafana**       |
+| **Log Collection / Aggregation** | **Grafana Loki**               |
+| **Containerization**             | Docker & Docker Compose        |
+| **Caching**                  | Redis (허브 정보·경로 캐싱 용도)         |
+
+### 1. Spring Cloud Eureka (Service Discovery)
+선택 이유
+- 서버 간 위치 정보를 자동으로 등록/조회하여 동적 라우팅 가능
+- MSA 환경에서 서비스 확장/축소 시에도 안정적 통신 보장
+- Gateway, Config Server 등 Spring Cloud 구성요소와 자연스럽게 연동
+
+### 2. Spring Cloud Gateway
+선택 이유
+- 모든 API 트래픽을 단일 진입점에서 제어 가능 (인증/로그/필터 관리)
+- 라우팅, 인증 연동, Rate Limit 등 정책 적용이 매우 유연함
+- Netty 기반 비동기 처리로 고성능 트래픽 처리에 적합
+
+### 3. Spring Cloud Config Server
+선택 이유
+- MSA 환경에서 공통 설정을 중앙에서 관리 가능
+- 프로파일·서비스별 YML 분리로 운영 환경 관리 용이
+- Git 기반 설정 버전 관리 → 장애 대응 및 변경 추적이 쉬움
+
+### 4. Keycloak + JWT (Auth)
+선택 이유
+- RBAC 기반 권한 체계를 손쉽게 구현 가능 (허브/업체/관리자 분리)
+- OAuth2·OpenID 기반으로 대규모 인증 구조에 적합
+- 토큰 기반 인증으로 Gateway–Service 간 인증 비용 최소화
+
+### 5. Apache Kafka (Messaging)
+선택 이유
+- 허브 이동/배송 이벤트를 비동기 처리해 서비스 간 결합도 감소
+- 대량 트래픽 처리에 최적화된 고성능 스트리밍 플랫폼
+- 장애 격리·재처리·순서 보장 등 물류 이벤트 처리에 필수 기능 제공
+  
+### 6. Prometheus (Metrics 수집)
+선택 이유
+- 각 서비스의 CPU·메모리·트래픽 등 운영 지표 실시간 수집
+- Spring Actuator와 쉽게 연동되어 Dashboard 구성 용이
+- MSA 환경에서 자동 스크랩 구조로 확장성이 우수
+
+### 7. Grafana (모니터링 시각화)
+선택 이유
+- Prometheus 수집 데이터의 대시보드를 직관적으로 보여줌
+- 서비스별 지표를 한 화면에 통합 → 운영 효율 극대화
+- Alerting 기능으로 장애를 즉시 감지할 수 있음
+
+### 8. Loki (로그 중앙화)
+선택 이유
+- 모든 서비스 로그를 한곳에 모아 장애 진단 속도 향상
+- Prometheus/Grafana와 같은 생태계라 운영 비용이 낮음
+- 라벨 기반 검색으로 MSA 구조에서도 로그 추적이 매우 쉬움
+
+### 9. Docker
+선택 이유
+- 모든 서비스를 동일한 환경에서 실행할 수 있어 배포 안정성 확보
+- 개발/테스트/프로덕션 환경을 표준화 가능
+- Eureka·Gateway·Keycloak·Zipkin 등 여러 컴포넌트를 빠르게 구성 가능
+
+
+
+
+
+
+
+
+
