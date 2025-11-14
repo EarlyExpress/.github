@@ -648,7 +648,6 @@ API 경로 체계
 ## 결제
 
 ## 도메인 간 의존 관계
-
 ![image.png](attachment:06dde727-c9b6-4ad2-b0a5-0194a24e412c:image.png)
 
 ![image.png](attachment:24f4295e-95b3-4015-8c69-0734ddc5b86f:image.png)
