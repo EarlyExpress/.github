@@ -1,5 +1,13 @@
 # EarlyExpress 프로젝트
 
+## EarlyExpress
+EarlyExpress는 전국 17개 지역 물류 허브를 중심으로 운영되는 기업용 물류 플랫폼입니다.
+우리의 목표는 허브 간 물류 이동·배송·업체 관리를 하나의 일관된 플랫폼에서 처리하여
+기업의 물류 운영 효율을 극대화하는 것입니다.
+
+전통적인 물류 운영에서 발생하는 복잡한 수작업 절차(업체 확인, 배송 배정, 이동 경로 관리, 권한 관리)를
+클라우드 기반 MSA 아키텍처로 재설계하여 확장성과 안정성을 확보했습니다.
+
 ## 문제 정의
 국내 물류 산업은 지역 허브를 기반으로 운영되며,
 허브 간 이동·배송 인력 관리·업체 관리·주문 처리 등 여러 복잡한 도메인이 동시에 얽혀 있는 구조를 가진다.
@@ -53,10 +61,81 @@ EarlyExpress는 이러한 실제 대규모 물류 시스템을
 - 구현은 "교육 가능한 수준"으로 단순화
 - 확장성·분리·도메인 경계 설계 등 MSA의 핵심 경험을 획득
 
-국내 물류 관리·배송 시스템 (MSA 기반)
+## 주요 기술 스택
+| 영역                               | 기술                             |
+| -------------------------------- | ------------------------------ |
+| **Backend**                      | Spring Boot 3.x                |
+| **Database**                     | PostgreSQL (서비스별 독립 스키마 구조)    |
+| **Service Discovery**            | Spring Cloud Eureka            |
+| **API Gateway**                  | Spring Cloud Gateway           |
+| **Configuration Management**     | **Spring Cloud Config Server** |
+| **Authentication/Authorization** | Keycloak + JWT, RBAC 기반        |
+| **Asynchronous Messaging**       | **Apache Kafka**               |
+| **Distributed Tracing**          | Zipkin                         |
+| **AI/ML**                        | Spring AI + Gemini API         |
+| **Documentation**                | Swagger / SpringDoc            |
+| **Monitoring**                   | **Prometheus + Grafana**       |
+| **Log Collection / Aggregation** | **Grafana Loki**               |
+| **Containerization**             | Docker & Docker Compose        |
+| **Caching**                  | Redis (허브 정보·경로 캐싱 용도)         |
 
-EarlyExpress는 국내 지역 단위 허브 물류 네트워크를 운영하는 기업을 위한
-B2B 물류 관리 플랫폼입니다.
-각 지역 허브 간의 배송 흐름을 디지털화하고, 배송 인력 배정부터 업체 관리까지
-전체 물류 프로세스를 MSA 기반으로 자동화·최적화합니다.
+### Spring Cloud Eureka (Service Discovery)
+선택 이유
+- 서버 간 위치 정보를 자동으로 등록/조회하여 동적 라우팅 가능
+- MSA 환경에서 서비스 확장/축소 시에도 안정적 통신 보장
+- Gateway, Config Server 등 Spring Cloud 구성요소와 자연스럽게 연동
+
+### Spring Cloud Gateway
+선택 이유
+- 모든 API 트래픽을 단일 진입점에서 제어 가능 (인증/로그/필터 관리)
+- 라우팅, 인증 연동, Rate Limit 등 정책 적용이 매우 유연함
+- Netty 기반 비동기 처리로 고성능 트래픽 처리에 적합
+
+### Spring Cloud Config Server
+선택 이유
+- MSA 환경에서 공통 설정을 중앙에서 관리 가능
+- 프로파일·서비스별 YML 분리로 운영 환경 관리 용이
+- Git 기반 설정 버전 관리 → 장애 대응 및 변경 추적이 쉬움
+
+### Keycloak + JWT (Auth)
+선택 이유
+- RBAC 기반 권한 체계를 손쉽게 구현 가능 (허브/업체/관리자 분리)
+- OAuth2·OpenID 기반으로 대규모 인증 구조에 적합
+- 토큰 기반 인증으로 Gateway–Service 간 인증 비용 최소화
+
+### Apache Kafka (Messaging)
+선택 이유
+- 허브 이동/배송 이벤트를 비동기 처리해 서비스 간 결합도 감소
+- 대량 트래픽 처리에 최적화된 고성능 스트리밍 플랫폼
+- 장애 격리·재처리·순서 보장 등 물류 이벤트 처리에 필수 기능 제공
+  
+### Prometheus (Metrics 수집)
+선택 이유
+- 각 서비스의 CPU·메모리·트래픽 등 운영 지표 실시간 수집
+- Spring Actuator와 쉽게 연동되어 Dashboard 구성 용이
+- MSA 환경에서 자동 스크랩 구조로 확장성이 우수
+
+### Grafana (모니터링 시각화)
+선택 이유
+- Prometheus 수집 데이터의 대시보드를 직관적으로 보여줌
+- 서비스별 지표를 한 화면에 통합 → 운영 효율 극대화
+- Alerting 기능으로 장애를 즉시 감지할 수 있음
+
+### Loki (로그 중앙화)
+선택 이유
+- 모든 서비스 로그를 한곳에 모아 장애 진단 속도 향상
+- Prometheus/Grafana와 같은 생태계라 운영 비용이 낮음
+- 라벨 기반 검색으로 MSA 구조에서도 로그 추적이 매우 쉬움
+
+### Docker
+선택 이유
+- 모든 서비스를 동일한 환경에서 실행할 수 있어 배포 안정성 확보
+- 개발/테스트/프로덕션 환경을 표준화 가능
+- Eureka·Gateway·Keycloak·Zipkin 등 여러 컴포넌트를 빠르게 구성 가능
+
+
+
+
+
+
 
