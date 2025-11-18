@@ -133,6 +133,11 @@ EarlyExpress는 이러한 실제 대규모 물류 시스템을
 - 개발/테스트/프로덕션 환경을 표준화 가능
 - Eureka·Gateway·Keycloak·Zipkin 등 여러 컴포넌트를 빠르게 구성 가능
 
+  ## 프로젝트 아키텍처
+  <img width="1036" height="735" alt="image" src="https://github.com/user-attachments/assets/4882b6be-fa1e-479a-8f51-885828d4ecde" />
+
+
+
 
 
 
